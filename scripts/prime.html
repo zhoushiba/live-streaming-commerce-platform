@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>演示环境初始化</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #0b0f1a;
+        color: #e8eefc;
+        font-family: ui-sans-serif, system-ui, 'Microsoft YaHei', sans-serif;
+      }
+      .wrap {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        gap: 12px;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      .card {
+        width: min(560px, 100%);
+        padding: 22px;
+        border-radius: 14px;
+        background: #161d31;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 10px;
+      }
+      p,
+      li {
+        font-size: 12px;
+        line-height: 1.8;
+        color: #9aa8c7;
+      }
+      code {
+        font-family: ui-monospace, Consolas, monospace;
+        color: #7fe7c4;
+      }
+      .ok {
+        color: #21d4b4;
+      }
+      .err {
+        color: #ff6b9d;
+      }
+      ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>演示环境初始化（仅本地截图 / 冒烟验证用）</h1>
+        <p>这个页面会登录演示账号，把 JWT 写进 <code>localStorage</code>，然后跳到目标 hash 路由。</p>
+        <ul id="log"></ul>
+        <p id="state">正在初始化…</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const qs = new URLSearchParams(location.search);
+        const as = qs.get('as') || 'viewer';
+        const goto = qs.get('goto') || '/';
+        const prepay = qs.get('prepay') || '';
+        const logEl = document.getElementById('log');
+        const stateEl = document.getElementById('state');
+
+        const PASSWORDS = {
+          viewer: 'Viewer@123456',
+          viewer2: 'Viewer2@123456',
+          anchor: 'Anchor@123456',
+          admin: 'Admin@123456',
+        };
+
+        function log(text, kind) {
+          const li = document.createElement('li');
+          li.textContent = text;
+          if (kind) li.className = kind;
+          logEl.appendChild(li);
+        }
+
+        async function api(path, options) {
+          const opts = options || {};
+          const response = await fetch(path, {
+            ...opts,
+            headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || (body && typeof body.code === 'number' && body.code !== 0)) {
+            throw new Error((body && body.message) || 'HTTP ' + response.status);
+          }
+          return body.data;
+        }
+
+        async function run() {
+          log('登录演示账号：' + as);
+          const session = await api('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: as, password: PASSWORDS[as] || PASSWORDS.viewer }),
+          });
+          localStorage.setItem('lc_access_token', session.accessToken);
+          localStorage.setItem('lc_refresh_token', session.refreshToken);
+          log('JWT 已写入 localStorage（role=' + session.user.role + '）', 'ok');
+
+          const token = session.accessToken;
+          const authed = (path, options) =>
+            api(path, {
+              ...options,
+              headers: { Authorization: 'Bearer ' + token, ...(options && options.headers) },
+            });
+
+          if (prepay === 'recharge') {
+            const order = await authed('/api/orders', {
+              method: 'POST',
+              body: JSON.stringify({
+                bizType: 'recharge',
+                amount: 88,
+                idempotencyKey: 'prime-recharge-' + Date.now(),
+              }),
+            });
+            log('已创建充值订单 ' + order.orderNo + '（¥' + order.amount + '）', 'ok');
+            const payment = await authed('/api/payments/create', {
+              method: 'POST',
+              body: JSON.stringify({ orderNo: order.orderNo, provider: 'mock' }),
+            });
+            log('已发起 mock 支付，outTradeNo=' + payment.outTradeNo, 'ok');
+            sessionStorage.setItem('lc_mock_pay:' + payment.outTradeNo, JSON.stringify(payment.mockNotifyBody));
+            stateEl.innerHTML =
+              '跳转到模拟收银台 <code>#/pay/mock?outTradeNo=' + payment.outTradeNo + '</code>';
+            location.replace('/#/pay/mock?outTradeNo=' + encodeURIComponent(payment.outTradeNo));
+            return;
+          }
+
+          if (prepay === 'room') {
+            const roomId = Number(qs.get('roomId') || 1);
+            const order = await authed('/api/orders', {
+              method: 'POST',
+              body: JSON.stringify({
+                bizType: 'room',
+                targetId: roomId,
+                idempotencyKey: 'prime-room-' + roomId + '-' + Date.now(),
+              }),
+            });
+            log('已创建直播间订单 ' + order.orderNo, 'ok');
+            const payment = await authed('/api/payments/create', {
+              method: 'POST',
+              body: JSON.stringify({ orderNo: order.orderNo, provider: 'mock' }),
+            });
+            sessionStorage.setItem('lc_mock_pay:' + payment.outTradeNo, JSON.stringify(payment.mockNotifyBody));
+            await authed('/api/payments/mock/notify', {
+              method: 'POST',
+              body: JSON.stringify(payment.mockNotifyBody),
+            });
+            log('已自动完成支付回调（权益已发放）', 'ok');
+            stateEl.innerHTML = '跳转到直播间 <code>#/room/' + roomId + '</code>';
+            location.replace('/#/room/' + roomId);
+            return;
+          }
+
+          stateEl.innerHTML = '跳转到 <code>#' + goto + '</code>';
+          location.replace('/#' + goto);
+        }
+
+        run().catch(function (error) {
+          stateEl.textContent = '初始化失败：' + error.message + '（请确认后端已启动在 3000）';
+          stateEl.className = 'err';
+        });
+      })();
+    </script>
+  </body>
+</html>

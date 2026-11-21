@@ -1,0 +1,32 @@
+{
+  "name": "live-commerce-web",
+  "version": "1.0.0",
+  "description": "直播电商平台前端：Vue3 + Vite + Pinia + hls.js + flv.js",
+  "license": "MIT",
+  "author": "zhoushiba",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit -p tsconfig.app.json && vite build",
+    "build:only": "vite build",
+    "preview": "vite preview --port 5173"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.8.4",
+    "element-plus": "^2.9.7",
+    "flv.js": "^1.6.2",
+    "hls.js": "^1.6.2",
+    "pinia": "^3.0.1",
+    "socket.io-client": "^4.8.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.0",
+    "typescript": "^5.8.2",
+    "vite": "^7.0.0",
+    "vue-tsc": "^2.2.8"
+  }
+}

@@ -1,0 +1,291 @@
+/* ==========================================================================
+   星播 Live — 全局样式
+   设计取向：深色直播间底色 + 青紫渐变强调色，卡片用细描边与柔和投影区分层级，
+   数字/价格统一等宽，避免中文环境下金额对不齐。
+   ========================================================================== */
+
+:root {
+  --bg-root: #0b0f1a;
+  --bg-elevated: #121829;
+  --bg-card: #161d31;
+  --bg-card-hover: #1b2338;
+  --border-soft: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text-primary: #eef2ff;
+  --text-secondary: #a4b0d0;
+  --text-muted: #6c7899;
+  --brand: #5b8cff;
+  --brand-2: #b06bff;
+  --brand-3: #21d4b4;
+  --danger: #ff5c72;
+  --warning: #ffb547;
+  --success: #2fd6a6;
+  --gradient-brand: linear-gradient(135deg, #5b8cff 0%, #b06bff 100%);
+  --gradient-hot: linear-gradient(135deg, #ff6b9d 0%, #ff9d5c 100%);
+  --shadow-card: 0 18px 40px rgba(4, 8, 20, 0.45);
+  --shadow-glow: 0 0 0 1px rgba(91, 140, 255, 0.35), 0 12px 32px rgba(91, 140, 255, 0.22);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --header-h: 64px;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 12% -8%, rgba(91, 140, 255, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 88% 0%, rgba(176, 107, 255, 0.14), transparent 55%),
+    var(--bg-root);
+  color: var(--text-primary);
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------- 布局骨架 */
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 24px 72px;
+}
+
+.page-narrow {
+  max-width: 780px;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--gradient-brand);
+}
+
+.section-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.card-pad {
+  padding: 20px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.7;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.tag-live {
+  color: #fff;
+  background: var(--gradient-hot);
+  box-shadow: 0 4px 14px rgba(255, 107, 157, 0.35);
+}
+
+.tag-free {
+  color: #7bf3d2;
+  background: rgba(33, 212, 180, 0.12);
+  border-color: rgba(33, 212, 180, 0.32);
+}
+
+.tag-paid {
+  color: #ffcf8a;
+  background: rgba(255, 181, 71, 0.12);
+  border-color: rgba(255, 181, 71, 0.3);
+}
+
+.tag-muted {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-soft);
+}
+
+.price {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #ffd08a;
+}
+
+/* --------------------------------------------------------------- 网格 */
+.grid-rooms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 20px;
+}
+
+.grid-videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.empty-state {
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------- 过渡 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* --------------------------------------------------------------- Element Plus 深色适配 */
+:root {
+  --el-color-primary: #5b8cff;
+  --el-bg-color: #161d31;
+  --el-bg-color-overlay: #1b2338;
+  --el-text-color-primary: #eef2ff;
+  --el-text-color-regular: #c8d2ee;
+  --el-text-color-secondary: #a4b0d0;
+  --el-border-color: rgba(255, 255, 255, 0.12);
+  --el-border-color-light: rgba(255, 255, 255, 0.08);
+  --el-fill-color-blank: #121829;
+  --el-mask-color: rgba(6, 10, 20, 0.72);
+}
+
+.el-card,
+.el-dialog,
+.el-drawer,
+.el-popover,
+.el-message-box {
+  background: var(--bg-card) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-primary) !important;
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 0 0 1px var(--border-soft) inset !important;
+}
+
+.el-input__inner,
+.el-textarea__inner {
+  color: var(--text-primary) !important;
+}
+
+.el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(255, 255, 255, 0.03);
+  --el-table-border-color: var(--border-soft);
+  --el-table-text-color: var(--text-secondary);
+  --el-table-header-text-color: var(--text-primary);
+}
+
+.el-table__body tr:hover > td {
+  background: rgba(91, 140, 255, 0.08) !important;
+}
+
+.el-button--primary {
+  --el-button-bg-color: #5b8cff;
+  --el-button-border-color: #5b8cff;
+  background-image: var(--gradient-brand);
+  border: none;
+}
+
+.el-pagination {
+  justify-content: center;
+  margin-top: 26px;
+  --el-pagination-bg-color: transparent;
+  --el-pagination-button-disabled-bg-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

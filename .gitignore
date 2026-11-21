@@ -1,0 +1,56 @@
+# ---------- 依赖 ----------
+node_modules/
+dist/
+target/
+__pycache__/
+*.pyc
+.venv/
+coverage/
+
+# ---------- 环境与密钥 ----------
+.env
+.env.local
+.env.*.local
+*.pem
+*.p12
+*.key
+!docs/**/*.pem
+
+# ---------- 运行产物 ----------
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+logs/
+
+# ---------- 数据库与本地存储 ----------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+storage/uploads/*
+!storage/uploads/.gitkeep
+storage/sandbox/*
+!storage/sandbox/.gitkeep
+storage/mock/*
+!storage/mock/.gitkeep
+# 直播切片：保留仓库内演示切片，忽略本机推流产生的大文件
+storage/streams/**/*.tmp
+storage/streams/**/*.flv
+!storage/streams/room-1/live.flv
+
+# ---------- 编辑器 / 系统 ----------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---------- 前端构建缓存 ----------
+frontend/.vite/
+frontend/dist/
+.vite/
+*.tsbuildinfo
